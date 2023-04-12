@@ -1,0 +1,27 @@
+{
+    "name": "sequelize-search-params-short-practice",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
+        "express-async-errors": "^3.1.1",
+        "fs": "^0.0.1-security",
+        "sequelize": "^6.6.5",
+        "sequelize-cli": "^6.2.0",
+        "sqlite3": "^5.1.6",
+        "stable-diffusion-api": "^0.0.5"
+    },
+    "devDependencies": {
+        "dotenv-cli": "^5.1.0",
+        "nodemon": "^2.0.12"
+    }
+}
