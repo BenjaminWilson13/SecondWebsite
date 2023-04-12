@@ -10,7 +10,7 @@ const fs = require('fs');
 
 const jason = {
     "prompt": "a photograph of an astronaut riding a horse",
-    "seed": 4956576,
+    "seed": 0,
     "used_random_seed": true,
     "negative_prompt": "",
     "num_outputs": 1,
@@ -32,13 +32,20 @@ const jason = {
     "active_tags": [],
     "inactive_tags": [],
     "sampler_name": "euler_a",
-    "session_id": "1679446987820"
+    "session_id": "1679446917820"
 }
+
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
+  }
 
 app.use('/', express.static('static')); 
 
 app.get('/createImage', async (req, res) => {
     debugger
+    jason.seed = getRandomIntInclusive(1000000000, 9999999999); 
     const body = JSON.stringify(jason)
     const headers = { "Content-Type": "application/json" };
     const options = {
@@ -48,20 +55,20 @@ app.get('/createImage', async (req, res) => {
     }
     let render = await fetch("http://192.168.1.100:9000/render", options);
     render = await render.json();
-    console.log(render);
+    console.log('render: ', render, render.task);
 
 
     let result; 
     while (true) {
 
-        result = await fetch('http://192.168.1.100:9000/ping?session_id=1679446987820');
+        result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
         result = await result.json();
         if (result.status === 'Online') {
             break; 
         } 
     }
 
-    let image = await fetch(`http://192.168.1.100:9000/image/stream/${render.task}`)
+    let image = await fetch(`http://192.168.1.100:9000/image/stream/${Number.parseInt(render.task)}`)
     let data = await image.text(); 
     data = data.split(' '); 
     let maxIndex = 0; 
@@ -74,8 +81,6 @@ app.get('/createImage', async (req, res) => {
     }
     data = data[maxIndex].split(',')[1]; 
     data = data.split('"')[0]; 
-    console.log(data); 
-    console.log(maxLength); 
     const img = Buffer.from(data, 'base64'); 
 
     fs.writeFile("out.png", data, 'base64', function(err) {
