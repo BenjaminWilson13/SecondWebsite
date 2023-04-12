@@ -83,9 +83,9 @@ app.get('/createImage', async (req, res) => {
     data = data.split('"')[0]; 
     const img = Buffer.from(data, 'base64'); 
 
-    fs.writeFile("out.png", data, 'base64', function(err) {
-        console.log(err);
-      });
+    // fs.writeFile("out.png", data, 'base64', function(err) {
+    //     console.log(err);
+    //   });
 
     res.writeHead(200, {
         'Content-Type': 'image/png', 
