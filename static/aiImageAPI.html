@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.ico" type="image/png">
     <title>Home</title>
-    <script src="scripts.js" type="module"></script>
+    <script src="/pictureGeneration.js"></script>
 </head>
 
 <body>
@@ -57,6 +57,22 @@
         </h1>
         <p>
             This button will have my desktop generate an image!
+        </p>
+        <p>
+            It can make pretty much whatever you want, within reason. If no picture of what you want exists, you'll
+            probably not get a good result.
+        </p>
+        <form method="get">
+            <fieldset>
+                <legend>Generate a picture!</legend>
+                <label for="prompt">What you want a picture of:</label>
+                <input type="text" id="prompt" class="prompt" name="prompt_box">
+                <button class="submit">Go!</button>
+            </fieldset>
+        </form>
+        <p>
+            Be aware that it'll take several seconds to load. My GPU is good, but generating an image with AI still
+            takes several seconds, be patient and you'll have your picture!
         </p>
     </div>
 

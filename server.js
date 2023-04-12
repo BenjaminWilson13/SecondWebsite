@@ -6,7 +6,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
-const fs = require('fs'); 
+const fs = require('fs');
 
 const jason = {
     "prompt": "a photograph of an astronaut riding a horse",
@@ -39,13 +39,18 @@ function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
-  }
+}
+app.use(express.urlencoded());
+app.use(express.json());
 
-app.use('/', express.static('static')); 
 
-app.get('/createImage', async (req, res) => {
+app.get('/aiImageAPI.html', async (req, res, next) => {
     debugger
-    jason.seed = getRandomIntInclusive(1000000000, 9999999999); 
+    if (!req.query.prompt_box) {
+        return next(); 
+    }
+    jason.prompt = req.body.prompt_box; 
+    jason.seed = getRandomIntInclusive(1000000000, 9999999999);
     const body = JSON.stringify(jason)
     const headers = { "Content-Type": "application/json" };
     const options = {
@@ -58,46 +63,44 @@ app.get('/createImage', async (req, res) => {
     console.log('render: ', render, render.task);
 
 
-    let result; 
+    let result;
     while (true) {
 
         result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
         result = await result.json();
         if (result.status === 'Online') {
-            break; 
-        } 
+            break;
+        }
     }
 
     let image = await fetch(`http://192.168.1.100:9000/image/stream/${Number.parseInt(render.task)}`)
-    let data = await image.text(); 
-    data = data.split(' '); 
-    let maxIndex = 0; 
-    let maxLength = -Infinity; 
+    let data = await image.text();
+    data = data.split(' ');
+    let maxIndex = 0;
+    let maxLength = -Infinity;
     for (let i = 0; i < data.length; i++) {
         if (data[i].length > maxLength) {
-            maxIndex = i; 
-            maxLength = data[i].length; 
+            maxIndex = i;
+            maxLength = data[i].length;
         }
     }
-    data = data[maxIndex].split(',')[1]; 
-    data = data.split('"')[0]; 
-    const img = Buffer.from(data, 'base64'); 
+    data = data[maxIndex].split(',')[1];
+    data = data.split('"')[0];
+    const img = Buffer.from(data, 'base64');
 
     // fs.writeFile("out.png", data, 'base64', function(err) {
     //     console.log(err);
     //   });
 
     res.writeHead(200, {
-        'Content-Type': 'image/png', 
+        'Content-Type': 'image/png',
         'Content-Length': img.length
-    }); 
+    });
 
-    res.end(img); 
-    
-
-   
-
+    res.end(img);
 })
+
+app.use('/', express.static('static'));
 
 const port = 5000;
 app.listen(port, () => console.log('Server is listening on port', port));
