@@ -70,6 +70,7 @@ app.get('/generateImage/:prompt', async (req, res, next) => {
         return next();
     }
     try {
+        console.log(req.params.prompt); 
         const cookies = new Cookies(req, res);
         const sessionId = cookies.get('sessionId');
         console.log(sessionId);
