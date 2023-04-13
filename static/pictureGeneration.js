@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return legend.innerText = 'Gotta enter some text!'; 
         }
         legend.style.color = 'white'; 
-        legend.innerText = 'Generate a picture!'; 
+        legend.innerText = 'Generating! One moment please!'; 
         const promptValue = promptBox.value; 
         promptBox.value = ''; 
         let picture = await fetch(`/generateImage/${promptValue}`); 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         img.style.marginBottom = '25px'; 
         pictureBox.appendChild(img); 
         pictureBox.appendChild(pTag); 
-
+        legend.innerText = 'Generate a picture!'
     })
 
     const statusHeader = document.querySelector('#status'); 
