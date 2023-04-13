@@ -9,7 +9,7 @@ const app = express();
 const fs = require('fs');
 
 const jason = {
-    "prompt": "a photograph of an astronaut riding a horse",
+    "prompt": "default",
     "seed": 0,
     "used_random_seed": true,
     "negative_prompt": "",
@@ -28,7 +28,7 @@ const jason = {
     "output_format": "png",
     "output_quality": 75,
     "metadata_output_format": "txt",
-    "original_prompt": "a photograph of an astronaut riding a horse",
+    "original_prompt": "",
     "active_tags": [],
     "inactive_tags": [],
     "sampler_name": "euler_a",
@@ -45,60 +45,63 @@ app.use(express.json());
 
 
 app.get('/aiImageAPI.html', async (req, res, next) => {
-    debugger
-    if (!req.query.prompt_box) {
-        return next(); 
-    }
-    jason.prompt = req.query.prompt_box; 
-    console.log(jason.prompt); 
-    jason.seed = getRandomIntInclusive(1000000000, 9999999999);
-    const body = JSON.stringify(jason)
-    const headers = { "Content-Type": "application/json" };
-    const options = {
-        method: "POST",
-        headers: headers,
-        body: body
-    }
-    let render = await fetch("http://192.168.1.100:9000/render", options);
-    render = await render.json();
-    console.log('render: ', render, render.task);
-
-
-    let result;
-    while (true) {
-
-        result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
-        result = await result.json();
-        if (result.status === 'Online') {
-            break;
+    try {
+        if (!req.query.prompt_box) {
+            return next();
         }
-    }
-
-    let image = await fetch(`http://192.168.1.100:9000/image/stream/${Number.parseInt(render.task)}`)
-    let data = await image.text();
-    data = data.split(' ');
-    let maxIndex = 0;
-    let maxLength = -Infinity;
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].length > maxLength) {
-            maxIndex = i;
-            maxLength = data[i].length;
+        jason.prompt = req.query.prompt_box;
+        console.log(jason.prompt);
+        jason.seed = getRandomIntInclusive(1000000000, 9999999999);
+        const body = JSON.stringify(jason)
+        const headers = { "Content-Type": "application/json" };
+        const options = {
+            method: "POST",
+            headers: headers,
+            body: body
         }
+        let render = await fetch("http://192.168.1.100:9000/render", options);
+        render = await render.json();
+        console.log('render: ', render, render.task);
+
+
+        let result;
+        while (true) {
+
+            result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
+            result = await result.json();
+            if (result.status === 'Online') {
+                break;
+            }
+        }
+
+        let image = await fetch(`http://192.168.1.100:9000/image/stream/${Number.parseInt(render.task)}`)
+        let data = await image.text();
+        data = data.split(' ');
+        let maxIndex = 0;
+        let maxLength = -Infinity;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].length > maxLength) {
+                maxIndex = i;
+                maxLength = data[i].length;
+            }
+        }
+        data = data[maxIndex].split(',')[1];
+        data = data.split('"')[0];
+        const img = Buffer.from(data, 'base64');
+
+        // fs.writeFile("out.png", data, 'base64', function(err) {
+        //     console.log(err);
+        //   });
+
+        res.writeHead(200, {
+            'Content-Type': 'image/png',
+            'Content-Length': img.length
+        });
+
+        return res.end(img);
+    } catch (e) {
+        return res.send('Looks like my PC is offline, sorry about that!')
     }
-    data = data[maxIndex].split(',')[1];
-    data = data.split('"')[0];
-    const img = Buffer.from(data, 'base64');
-
-    // fs.writeFile("out.png", data, 'base64', function(err) {
-    //     console.log(err);
-    //   });
-
-    res.writeHead(200, {
-        'Content-Type': 'image/png',
-        'Content-Length': img.length
-    });
-
-    res.end(img);
 })
 
 app.use('/', express.static('static'));
