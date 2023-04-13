@@ -47,7 +47,7 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req.url, new Date()); 
+    console.log(req.method, req.url, new Date()); 
     // console.log(req.headers); 
     return next(); 
 })
@@ -63,12 +63,12 @@ app.get('/aiImageAPI.html/onlineStatus', async (req, res, next) => {
 })
 
 
-app.get('/aiImageAPI.html', async (req, res, next) => {
-    if (!req.query.prompt_box) {
+app.get('/generateImage/:prompt', async (req, res, next) => {
+    if (!req.params.prompt) {
         return next();
     }
     try {
-        jason.prompt = req.query.prompt_box;
+        jason.prompt = req.params.prompt;
         jason.seed = getRandomIntInclusive(0, 4294967295);
         const body = JSON.stringify(jason)
         const headers = { "Content-Type": "application/json" };
@@ -105,6 +105,7 @@ app.get('/aiImageAPI.html', async (req, res, next) => {
         }
         data = data[maxIndex].split(',')[1];
         data = data.split('"')[0];
+        return res.send(data); 
         const img = Buffer.from(data, 'base64');
 
         // fs.writeFile("out.png", data, 'base64', function(err) {
