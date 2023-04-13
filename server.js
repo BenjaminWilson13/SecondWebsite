@@ -66,7 +66,7 @@ app.get('/aiImageAPI.html', async (req, res, next) => {
     }
     try {
         jason.prompt = req.query.prompt_box;
-        jason.seed = getRandomIntInclusive(1000000000, 9999999999);
+        jason.seed = getRandomIntInclusive(0, 4294967295);
         const body = JSON.stringify(jason)
         const headers = { "Content-Type": "application/json" };
         const options = {
