@@ -55,7 +55,9 @@ app.use((req, res, next) => {
 })
 
 app.get('/aiImageAPI.html/onlineStatus', async (req, res, next) => {
-    let result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
+    const cookies = new Cookies(req, res);
+    const sessionId = cookies.get('sessionId');
+    let result = await fetch(`http://192.168.1.100:9000/ping?session_id=${sessionId}`);
     result = await result.json();
     if (result.status === 'Online') {
         return res.send('Online');
