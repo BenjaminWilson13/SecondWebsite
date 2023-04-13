@@ -43,14 +43,29 @@ function getRandomIntInclusive(min, max) {
 app.use(express.urlencoded());
 app.use(express.json());
 
+app.use((req, res, next) => {
+    console.log(req.url, new Date()); 
+    // console.log(req.headers); 
+    return next(); 
+})
+
+app.get('/aiImageAPI.html/onlineStatus', async (req, res, next) => {
+    let result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`); 
+    result = await result.json(); 
+    if (result.status === 'Online') {
+        return res.send('Online'); 
+    } else {
+        return res.send('Offline'); 
+    }
+})
+
 
 app.get('/aiImageAPI.html', async (req, res, next) => {
+    if (!req.query.prompt_box) {
+        return next();
+    }
     try {
-        if (!req.query.prompt_box) {
-            return next();
-        }
         jason.prompt = req.query.prompt_box;
-        console.log(jason.prompt);
         jason.seed = getRandomIntInclusive(1000000000, 9999999999);
         const body = JSON.stringify(jason)
         const headers = { "Content-Type": "application/json" };

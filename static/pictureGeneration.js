@@ -6,12 +6,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const button = document.querySelector('.submit'); 
     console.log(button);
 
-    button.addEventListener('click', async (event) => {
-        const textBox = document.querySelector('.prompt'); 
-        console.log(textBox, textBox.innerText); 
-        if (textBox.innerText) {
-
-        }
-    })  
-    
+    const statusHeader = document.querySelector('#status'); 
+    let status = await fetch('/aiImageAPI.html/onlineStatus'); 
+    status = await status.text(); 
+    if (status === `Online`) {
+        statusHeader.innerText = 'The image generator is Online!'; 
+        statusHeader.style.color = 'green'; 
+    }
 })
