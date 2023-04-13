@@ -134,4 +134,5 @@ footer {
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
+  word-break: break-word;
 }

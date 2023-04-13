@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         promptBox.value = ''; 
         let picture = await fetch(`/generateImage/${promptValue}`); 
         picture = await picture.text(); 
-        const textDiv = document.querySelector('#pictureBox'); 
+        const pictureBox = document.querySelector('#pictureBox'); 
         const img = document.createElement('img'); 
         const pTag = document.createElement('h3'); 
         pTag.innerText = `Your Prompt: ${promptValue}`; 
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         img.src += picture; 
         img.style.marginBottom = '25px'; 
-        textDiv.appendChild(img); 
-        textDiv.appendChild(pTag); 
+        pictureBox.appendChild(img); 
+        pictureBox.appendChild(pTag); 
 
     })
 
