@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     button.addEventListener('click', async (event) => {
         event.preventDefault(); 
         const promptBox = document.querySelector('#prompt'); 
+        const legend = document.querySelector('legend'); 
+        if (!promptBox.value) {
+            legend.style.color = 'red'; 
+            return legend.innerText = 'Gotta enter some text!'; 
+        }
+        legend.style.color = 'white'; 
+        legend.innerText = 'Generate a picture!'; 
         const promptValue = promptBox.value; 
         promptBox.value = ''; 
         let picture = await fetch(`/generateImage/${promptValue}`); 
