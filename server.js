@@ -6,6 +6,9 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
+const frameguard = require("frameguard");
+app.use(frameguard({ action: "SAMEORIGIN" }));
+
 const fs = require('fs');
 
 const jason = {
