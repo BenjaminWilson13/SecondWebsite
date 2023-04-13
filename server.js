@@ -1,5 +1,7 @@
 require('express-async-errors');
 const fetch = require("node-fetch");
+const Cookies = require('cookies');
+
 
 require('dotenv').config();
 
@@ -47,18 +49,18 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req.method, req.url, new Date()); 
+    console.log(req.method, req.url, new Date());
     // console.log(req.headers); 
-    return next(); 
+    return next();
 })
 
 app.get('/aiImageAPI.html/onlineStatus', async (req, res, next) => {
-    let result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`); 
-    result = await result.json(); 
+    let result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
+    result = await result.json();
     if (result.status === 'Online') {
-        return res.send('Online'); 
+        return res.send('Online');
     } else {
-        return res.send('Offline'); 
+        return res.send('Offline');
     }
 })
 
@@ -68,6 +70,10 @@ app.get('/generateImage/:prompt', async (req, res, next) => {
         return next();
     }
     try {
+        const cookies = new Cookies(req, res);
+        const sessionId = cookies.get('sessionId');
+        console.log(sessionId);
+        jason.session_id = sessionId;
         jason.prompt = req.params.prompt;
         jason.seed = getRandomIntInclusive(0, 4294967295);
         const body = JSON.stringify(jason)
@@ -79,33 +85,10 @@ app.get('/generateImage/:prompt', async (req, res, next) => {
         }
         let render = await fetch("http://192.168.1.100:9000/render", options);
         render = await render.json();
-        console.log('render: ', render, render.task);
 
 
-        let result;
-        while (true) {
 
-            result = await fetch(`http://192.168.1.100:9000/ping?session_id=${jason.session_id}`);
-            result = await result.json();
-            if (result.status === 'Online') {
-                break;
-            }
-        }
-
-        let image = await fetch(`http://192.168.1.100:9000/image/stream/${Number.parseInt(render.task)}`)
-        let data = await image.text();
-        data = data.split(' ');
-        let maxIndex = 0;
-        let maxLength = -Infinity;
-        for (let i = 0; i < data.length; i++) {
-            if (data[i].length > maxLength) {
-                maxIndex = i;
-                maxLength = data[i].length;
-            }
-        }
-        data = data[maxIndex].split(',')[1];
-        data = data.split('"')[0];
-        return res.send(data); 
+        return res.json(render);
         const img = Buffer.from(data, 'base64');
 
         // fs.writeFile("out.png", data, 'base64', function(err) {
@@ -119,8 +102,38 @@ app.get('/generateImage/:prompt', async (req, res, next) => {
 
         return res.end(img);
     } catch (e) {
+        console.log(e);
         return res.send('Looks like my PC is offline, sorry about that!')
     }
+})
+
+app.get('/getImage', async (req, res) => {
+    const cookies = new Cookies(req, res);
+    const sessionId = cookies.get('sessionId');
+    let result;
+    while (true) {
+
+        result = await fetch(`http://192.168.1.100:9000/ping?session_id=${sessionId}`);
+        result = await result.json();
+        if (result.status === 'Online') {
+            break;
+        }
+    }
+    const taskId = cookies.get('task');
+    let image = await fetch(`http://192.168.1.100:9000/image/stream/${taskId}`)
+    let data = await image.text();
+    data = data.split(' ');
+    let maxIndex = 0;
+    let maxLength = -Infinity;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].length > maxLength) {
+            maxIndex = i;
+            maxLength = data[i].length;
+        }
+    }
+    data = data[maxIndex].split(',')[1];
+    data = data.split('"')[0];
+    res.send(data);
 })
 
 app.use('/', express.static('static'));
