@@ -21,7 +21,7 @@
         "sequelize": "^6.6.5",
         "sequelize-cli": "^6.2.0",
         "sqlite3": "^5.1.6",
-        "stable-diffusion-api": "^0.0.5"
+        "stable-diffusion-api": "^0.0.7"
     },
     "devDependencies": {
         "dotenv-cli": "^7.2.1",
