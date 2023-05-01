@@ -18,7 +18,7 @@
         "frameguard": "^4.0.0",
         "fs": "^0.0.1-security",
         "node-fetch": "^3.3.1",
-        "sequelize": "^6.6.5",
+        "sequelize": "^6.31.1",
         "sequelize-cli": "^6.2.0",
         "sqlite3": "^5.1.6",
         "stable-diffusion-api": "^0.0.7"
